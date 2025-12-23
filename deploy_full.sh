@@ -5,7 +5,7 @@
 LOCAL_PATH=~/my-react-app
 REMOTE_USER=opc
 REMOTE_HOST=141.147.164.232
-REMOTE_DIR=/home/opc/react-app
+REMOTE_DIR=/var/www/react-app   # ✅ 수정됨
 SSH_KEY=~/Desktop/Yproject/SSH/ssh-key-2025-12-18.key
 GIT_MESSAGE="Auto deploy on $(date '+%Y-%m-%d %H:%M:%S')"
 
@@ -20,13 +20,13 @@ git push origin main
 echo "🧱 Building React project..."
 npm run build
 
-# 4️⃣ 기존 서버 파일 정리
+# 4️⃣ 서버 기존 파일 삭제
 echo "🧹 Cleaning old files on server..."
-ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo rm -rf $REMOTE_DIR/*"
+ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo rm -rf $REMOTE_DIR/build/*"
 
-# 5️⃣ build 폴더 업로드
+# 5️⃣ 새 빌드 업로드
 echo "🚀 Uploading new build files..."
-scp -i $SSH_KEY -r $LOCAL_PATH/build/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
+scp -i $SSH_KEY -r $LOCAL_PATH/build/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/build/
 
 # 6️⃣ 권한 수정
 ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo chmod -R 755 $REMOTE_DIR"
@@ -36,4 +36,4 @@ echo "🔄 Restarting Nginx..."
 ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo systemctl restart nginx"
 
 # 8️⃣ 완료
-echo "✅ Deployment complete! View site at: http://$REMOTE_HOST"
+echo "✅ Deployment complete! View at: http://$REMOTE_HOST"
