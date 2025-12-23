@@ -1,29 +1,39 @@
 #!/bin/bash
+# === React 프로젝트 자동 빌드 + Git 커밋 + 서버 배포 ===
 
-# === 설정값 ===
-GIT_REPO="https://github.com/ytyoung/Yproject-React.git"
-SERVER_USER="opc"
-SERVER_IP="141.147.164.232"
-SERVER_PATH="/var/www/react-app"
-NGINX_SERVICE="nginx"
+# 1️⃣ 환경 설정
+LOCAL_PATH=~/my-react-app
+REMOTE_USER=opc
+REMOTE_HOST=141.147.164.232
+REMOTE_DIR=/home/opc/react-app
+SSH_KEY=~/Desktop/Yproject/SSH/ssh-key-2025-12-18.key
+GIT_MESSAGE="Auto deploy on $(date '+%Y-%m-%d %H:%M:%S')"
 
-# === 1️⃣ Git 커밋 & 푸시 ===
-echo "📦 Git 커밋 & 푸시 중..."
+# 2️⃣ Git 커밋 & 푸시
+echo "📦 Committing and pushing to GitHub..."
+cd $LOCAL_PATH || exit
 git add .
-git commit -m "Auto deploy on $(date '+%Y-%m-%d %H:%M:%S')" || echo "⚠️ Commit skipped (no changes)"
-git push origin main || { echo "❌ Git push 실패"; exit 1; }
+git commit -m "$GIT_MESSAGE"
+git push origin main
 
-# === 2️⃣ React build ===
+# 3️⃣ React 빌드
 echo "🧱 Building React project..."
-npm run build || { echo "❌ Build 실패"; exit 1; }
+npm run build
 
-# === 3️⃣ 서버로 빌드파일 전송 ===
-echo "🚀 Deploying build to ${SERVER_IP}..."
-scp -r build/* ${SERVER_USER}@${SERVER_IP}:${SERVER_PATH}/ || { echo "❌ SCP 실패"; exit 1; }
+# 4️⃣ 기존 서버 파일 정리
+echo "🧹 Cleaning old files on server..."
+ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo rm -rf $REMOTE_DIR/*"
 
-# === 4️⃣ 원격 서버 Nginx 리로드 ===
-echo "🔄 Restarting Nginx remotely..."
-ssh ${SERVER_USER}@${SERVER_IP} "sudo systemctl restart ${NGINX_SERVICE}" || { echo "❌ Nginx 재시작 실패"; exit 1; }
+# 5️⃣ build 폴더 업로드
+echo "🚀 Uploading new build files..."
+scp -i $SSH_KEY -r $LOCAL_PATH/build/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
 
-echo "✅ All done! 배포 완료 🎉"
-echo "🌍 Visit: http://${SERVER_IP}"
+# 6️⃣ 권한 수정
+ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo chmod -R 755 $REMOTE_DIR"
+
+# 7️⃣ Nginx 재시작
+echo "🔄 Restarting Nginx..."
+ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo systemctl restart nginx"
+
+# 8️⃣ 완료
+echo "✅ Deployment complete! View site at: http://$REMOTE_HOST"
