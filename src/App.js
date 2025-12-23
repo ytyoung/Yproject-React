@@ -1,15 +1,23 @@
-import React from 'react';
-import './App.css';
+import express from "express";
+import pg from "pg";
 
-function App() {
-  return (
-    <div className="App" style={{ textAlign: 'center', marginTop: '100px' }}>
-      <h1>안녕하세요 👋</h1>
-      <h2>이건 React로 만든 첫 화면이에요!</h2>
-      <p>윤태영 님의 프로젝트 배포 테스트 중입니다 🚀</p>
-      <p>🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀</p>
-    </div>
-  );
-}
+const { Pool } = pg;
+const pool = new Pool({
+  user: "postgres",
+  host: "141.147.164.232",  // 네 오라클 인스턴스 IP
+  database: "postgres",
+  password: "keitadmin1",
+  port: 5432,
+});
 
-export default App;
+const app = express();
+app.use(express.json());
+
+app.get("/api/test", async (req, res) => {
+  const result = await pool.query("SELECT NOW()");
+  res.json(result.rows);
+});
+
+app.listen(8080, () => {
+  console.log("✅ Backend server running on port 8080");
+});
