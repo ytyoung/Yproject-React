@@ -29,12 +29,12 @@ echo "🚀 Uploading new build folder..."
 scp -i $SSH_KEY -r $LOCAL_PATH/build $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
 
 # === 5️⃣ 권한 수정 ===
-ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo chown -R opc:opc $REMOTE_DIR && sudo chmod -R 755 $REMOTE_DIR"
+ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo mkdir -p $REMOTE_DIR && sudo chown -R opc:opc $REMOTE_DIR && sudo chmod -R 755 $REMOTE_DIR"
 
 # === 6️⃣ Nginx 재시작 ===
 echo "🔄 Restarting Nginx..."
-ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo nginx -t && sudo systemctl restart nginx"
+ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo nginx -t; sudo systemctl restart nginx" 
 
 # === 7️⃣ 완료 알림 ===
 echo "✅ Deployment complete!"
-echo "🌍 View your site: http://$REMOTE_HOST"
+echo "✅ Deployment complete! View at: http://$REMOTE_HOST"
