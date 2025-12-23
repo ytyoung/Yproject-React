@@ -26,7 +26,7 @@ ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo rm -rf $REMOTE_DIR/*"
 
 # 5️⃣ build 폴더 업로드
 echo "🚀 Uploading new build files..."
-scp -i $SSH_KEY -r $LOCAL_PATH/build/* $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
+scp -i $SSH_KEY -r $LOCAL_PATH/build $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
 
 # 6️⃣ 권한 수정
 ssh -i $SSH_KEY $REMOTE_USER@$REMOTE_HOST "sudo chmod -R 755 $REMOTE_DIR"
