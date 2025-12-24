@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [name, setName] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,9 +18,15 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
-      setMessage(data.message);
+
+      if (data.success) {
+        setMessage("로그인 성공!");
+        setTimeout(() => navigate("/main"), 1000);
+      } else {
+        setMessage(data.message);
+      }
     } catch (err) {
-      setMessage("서버에 연결할 수 없습니다.");
+      setMessage("서버 연결 실패");
     }
   };
 
