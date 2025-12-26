@@ -22,6 +22,7 @@ function UploadPage() {
       const res = await axios.post("http://141.147.164.232/api/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      setResData(res.data);
       setUploadedUrl(`http://141.147.164.232${res.data.file.path}`);
       alert("✅ 업로드 성공!");
     } catch (err) {
