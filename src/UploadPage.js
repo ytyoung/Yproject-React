@@ -37,10 +37,13 @@ function UploadPage() {
       {preview && <div><img src={preview} alt="미리보기" style={{ width: "300px", marginTop: "10px" }} /></div>}
       <button onClick={handleUpload} style={{ marginTop: "10px" }}>업로드</button>
       {uploadedUrl && (
-        <div>
-          <p>✅ 서버에 저장된 이미지:</p>
-          <img src={uploadedUrl} alt="업로드 결과" style={{ width: "300px" }} />
-        </div>
+        <div style={{ marginTop: "20px" }}>
+            <p>✅ 서버에 저장된 이미지:</p>
+            <img src={uploadedUrl} alt="업로드 결과" style={{ width: "300px" }} />
+            {resData?.file?.tags && (
+                <p>🧩 자동 태그: {resData.file.tags.join(", ")}</p>
+            )}
+    </div>
       )}
     </div>
   );
