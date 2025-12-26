@@ -1,16 +1,13 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import MainPage from "./pages/MainPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import UploadPage from "./UploadPage";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/main" element={<MainPage />} />
+        <Route path="/" element={<UploadPage />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
