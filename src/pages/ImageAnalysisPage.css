@@ -1,0 +1,84 @@
+.analysis-container {
+  max-width: 600px;
+  margin: 40px auto;
+  text-align: center;
+  padding: 20px;
+}
+
+.page-title {
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* 파일 업로드 버튼 꾸미기 */
+.file-label {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.file-label:hover { background-color: #e0e0e0; }
+
+.preview-section { margin: 20px 0; }
+.preview-img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* 버튼 스타일 공통 */
+button {
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+button:active { transform: scale(0.98); }
+
+.btn-upload {
+  background-color: #333;
+  color: white;
+}
+.btn-analyze {
+  background-color: #4CAF50; /* PhotoSense 메인 컬러 */
+  color: white;
+}
+.btn-analyze.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 결과 키워드 태그 */
+.result-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed #ddd;
+}
+.keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+.keyword-tag {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}

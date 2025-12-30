@@ -1,0 +1,103 @@
+/* 상단 네비게이션 바 전체 */
+.navbar {
+  background-color: #ffffff;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px; /* 너무 넓어지지 않게 */
+  padding: 0 20px;
+}
+
+/* PhotoSense 로고 */
+.navbar-logo {
+  color: #333;
+  font-weight: 800;
+  font-size: 1.5rem;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+
+/* 메뉴 리스트 (평소에는 가로로 배치, 모바일엔 드롭다운) */
+.nav-menu {
+  display: flex;
+  list-style: none;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links {
+  color: #555;
+  text-decoration: none;
+  padding: 10px 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.nav-links:hover {
+  color: #4CAF50; /* 초록색 포인트 */
+  background-color: #f0fdf4;
+  border-radius: 5px;
+}
+
+/* 햄버거 아이콘 (기본적으로 숨김, 작은 화면에서 보임) */
+.menu-icon {
+  display: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hamburger-line {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  border-radius: 5px;
+}
+
+/* 반응형 (화면이 좁아지거나 NoonBox 스타일처럼 메뉴 숨길 때) */
+@media screen and (max-width: 768px) {
+  .nav-menu {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    position: absolute;
+    top: 70px;
+    right: -100%; /* 화면 밖으로 숨김 */
+    background-color: #fff;
+    box-shadow: -2px 5px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border-radius: 0 0 0 10px;
+  }
+
+  .nav-menu.active {
+    right: 0; /* 화면 안으로 들어옴 */
+  }
+
+  .nav-item {
+    width: 100%;
+  }
+
+  .nav-links {
+    display: block;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .menu-icon {
+    display: flex; /* 아이콘 보이기 */
+  }
+}
