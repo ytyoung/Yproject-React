@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./KeywordSearchPage.css"; // 스타일 파일 (다음 단계에서 만듦)
+import "./KeywordSearch.css"; // 스타일 파일 (다음 단계에서 만듦)
 
 function KeywordSearchPage() {
   const [query, setQuery] = useState(""); // 검색어

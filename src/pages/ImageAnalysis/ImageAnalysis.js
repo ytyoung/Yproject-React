@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./ImageAnalysisPage.css"; // CSS 파일 분리
+import "./ImageAnalysis.css"; // CSS 파일 분리
 
 function ImageAnalysisPage() {
   const [file, setFile] = useState(null);

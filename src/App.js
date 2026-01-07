@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import ImageAnalysisPage from "./pages/ImageAnalysisPage";
-import KeywordSearchPage from "./pages/KeywordSearchPage";
+import Navbar from "./components/Navbar/Navbar";
+import ImageAnalysis from "./pages/ImageAnalysis/ImageAnalysis";
+import KeywordSearch from "./pages/KeywordSearch/KeywordSearch";
 import "./App.css";
 
 function App() {
@@ -15,8 +15,8 @@ function App() {
         {/* URL에 따라 내용이 바뀌는 부분 */}
         <div className="content">
           <Routes>
-            <Route path="/" element={<ImageAnalysisPage />} />
-            <Route path="/search" element={<KeywordSearchPage />} />
+            <Route path="/" element={<ImageAnalysis />} />
+            <Route path="/search" element={<KeywordSearch />} />
           </Routes>
         </div>
       </div>
