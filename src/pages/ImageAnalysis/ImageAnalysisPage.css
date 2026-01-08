@@ -1,167 +1,146 @@
 .analysis-container {
-  max-width: 600px;
+  max-width: 800px;
   margin: 40px auto;
   text-align: center;
-  padding: 20px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
 .page-title {
   color: #333;
   margin-bottom: 30px;
+  font-weight: 800;
 }
 
-/* 파일 업로드 버튼 꾸미기 */
+/* 파일 업로드 & 미리보기 */
+.upload-box { margin-bottom: 20px; }
 .file-label {
   display: inline-block;
-  padding: 10px 20px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px 30px;
+  background-color: #f8f9fa;
+  border: 2px dashed #dde0e3;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.3s;
 }
-.file-label:hover { background-color: #e0e0e0; }
+.file-label:hover { background-color: #e9ecef; border-color: #adb5bd; }
 
-.preview-section { margin: 20px 0; }
+.preview-section { margin: 30px 0; }
 .preview-img {
   width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  max-width: 500px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-/* 버튼 스타일 공통 */
-button {
-  padding: 12px 24px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
-button:active { transform: scale(0.98); }
-
-.btn-upload {
-  background-color: #333;
-  color: white;
-}
+/* 분석 버튼 */
 .btn-analyze {
-  background-color: #4CAF50; /* PhotoSense 메인 컬러 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  transition: transform 0.2s;
 }
-.btn-analyze.disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
+.btn-analyze:hover:not(:disabled) { transform: translateY(-3px); }
+.btn-analyze:disabled { opacity: 0.7; cursor: not-allowed; }
 
-/* 결과 키워드 태그 */
-.result-section {
+/* 키워드 편집 영역 */
+.edit-section {
   margin-top: 40px;
-  padding-top: 20px;
-  border-top: 1px dashed #ddd;
+  padding-top: 30px;
+  border-top: 2px solid #f1f3f5;
 }
-.keyword-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 15px;
-}
-.keyword-tag {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-/* 2026.01.08 추가 */
-.sub-text {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-}
+.sub-text { color: #888; margin-bottom: 25px; }
 
 .keyword-edit-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   justify-content: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  align-items: center;
 }
 
+/* ✅ 새로운 해시태그 스타일 입력 그룹 */
 .keyword-input-group {
-  position: relative;
   display: flex;
   align-items: center;
+  background: #f0f2f5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.keyword-input-group:focus-within {
+  background: #e3e6ea; /* 입력 중일 때 배경색 변경 */
+}
+
+.hash-mark {
+  font-weight: bold;
+  color: #764ba2;
+  margin-right: 4px;
+  font-size: 1.1rem;
 }
 
 .keyword-input {
-  padding: 8px 15px;
-  border: 1px solid #4CAF50;
-  border-radius: 20px;
-  font-size: 14px;
-  color: #333;
-  width: 100px;
-  text-align: center;
-  outline: none;
-  background: #fff;
-}
-
-.keyword-input:focus {
-  background-color: #f0fdf4;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-}
-
-.btn-delete {
-  background: #ff5252;
-  color: white;
   border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
+  background: transparent; /* 배경 투명하게 */
+  font-size: 1rem;
+  color: #333;
+  width: 80px; /* 기본 너비 */
+  outline: none;
+  font-weight: 500;
+}
+.keyword-input::placeholder { color: #aaa; }
+
+/* ✅ 개선된 삭제 버튼 스타일 */
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
   cursor: pointer;
-  position: absolute;
-  top: -5px;
-  right: -5px;
+  padding: 0 0 0 8px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  transition: color 0.2s;
 }
+.btn-delete:hover { color: #ff4757; } /* 마우스 올리면 빨간색 */
 
+/* 태그 추가 버튼 */
 .btn-add {
   padding: 8px 15px;
-  background-color: #eee;
-  border: 1px dashed #aaa;
-  border-radius: 20px;
+  background: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
   cursor: pointer;
-  color: #555;
+  color: #777;
+  font-weight: 600;
+  height: 40px; /* 다른 태그들과 높이 맞춤 */
+  transition: all 0.3s;
 }
-.btn-add:hover { background-color: #ddd; }
+.btn-add:hover { border-color: #764ba2; color: #764ba2; background: #f9f9f9; }
 
+/* 최종 저장 버튼 */
 .btn-save-final {
-  background-color: #2196F3; /* 파란색 저장 버튼 */
+  background-color: #2ecc71; /* 상큼한 초록색 */
   color: white;
-  padding: 15px 40px;
-  font-size: 1.1rem;
-  font-weight: bold;
+  padding: 15px 50px;
+  font-size: 1.2rem;
+  font-weight: 800;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
-  transition: transform 0.2s;
+  box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+  transition: all 0.2s;
 }
-
-.btn-save-final:hover {
-  background-color: #1976D2;
-  transform: scale(1.05);
-}
+.btn-save-final:hover { background-color: #27ae60; transform: scale(1.05); }

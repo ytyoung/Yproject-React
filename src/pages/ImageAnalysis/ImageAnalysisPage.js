@@ -1,108 +1,111 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react"; // useRef 추가 (입력창 너비 자동조절용)
 import axios from "axios";
 import "./ImageAnalysisPage.css";
 
 function ImageAnalysisPage() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [uploadedId, setUploadedId] = useState(null); // DB ID 저장
-  const [keywords, setKeywords] = useState([]); // AI가 준 + 내가 수정한 키워드들
+  const [uploadedId, setUploadedId] = useState(null);
+  const [keywords, setKeywords] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [step, setStep] = useState(0); // 0:선택전, 1:업로드완료, 2:분석완료(수정모드), 3:저장완료
+  const [step, setStep] = useState(0);
+  
+  // 키워드 입력창 너비 자동 조절을 위한 ref 배열
+  const inputRefs = useRef([]);
 
-  // 1. 파일 선택 시 -> 바로 자동 업로드 실행
   const handleFileChange = async (e) => {
     const selected = e.target.files[0];
     if (!selected) return;
-
-    // 미리보기 세팅
     setFile(selected);
     setPreview(URL.createObjectURL(selected));
-    setKeywords([]); // 기존 키워드 초기화
+    setKeywords([]);
     setStep(0);
-
-    // 🚀 바로 서버로 업로드!
     await autoUpload(selected);
   };
 
-  // 자동 업로드 함수
   const autoUpload = async (selectedFile) => {
     const formData = new FormData();
     formData.append("image", selectedFile);
-
     try {
-      console.log("📤 자동 업로드 시작...");
       const res = await axios.post("http://141.147.164.232:8080/api/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      
-      setUploadedId(res.data.file.id); // DB ID 저장 (분석할 때 씀)
-      setStep(1); // 단계 이동
-      alert("✅ 이미지가 클라우드에 안전하게 저장되었습니다. 이제 AI 분석을 해보세요!");
+      setUploadedId(res.data.file.id);
+      setStep(1);
+      alert("✅ 이미지 업로드 완료! AI 분석을 실행해주세요.");
     } catch (err) {
       console.error(err);
-      alert("업로드 실패! 서버를 확인해주세요.");
+      alert("업로드 실패! 서버 상태를 확인해주세요.");
     }
   };
 
-  // 2. AI 분석 실행 (저장 안 하고 가져오기만 함)
   const handleAnalyze = async () => {
-    if (!uploadedId) return alert("이미지 ID가 없습니다. 다시 업로드해주세요.");
+    if (!uploadedId) return;
     setIsAnalyzing(true);
-
     try {
       const res = await axios.post(`http://141.147.164.232:8080/api/analyze/${uploadedId}`);
-      setKeywords(res.data.keywords); // 받아온 키워드를 state에 저장
-      setStep(2); // 수정 모드로 진입
+      setKeywords(res.data.keywords);
+      setStep(2);
     } catch (err) {
-      console.error("분석 에러:", err);
+      console.error(err);
       alert("AI 분석 실패");
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  // 3. 키워드 개별 수정 기능
   const handleKeywordChange = (index, value) => {
     const newKeywords = [...keywords];
     newKeywords[index] = value;
     setKeywords(newKeywords);
+    
+    // 입력된 글자 수에 맞춰 input 너비 자동 조절 (UX 개선)
+    if (inputRefs.current[index]) {
+        inputRefs.current[index].style.width = `${Math.max(value.length * 12, 60)}px`;
+    }
   };
 
-  // 4. 키워드 삭제 기능
   const handleDeleteKeyword = (index) => {
     const newKeywords = keywords.filter((_, i) => i !== index);
     setKeywords(newKeywords);
   };
 
-  // 5. 키워드 추가 기능
   const handleAddKeyword = () => {
-    setKeywords([...keywords, "새키워드"]);
+    setKeywords([...keywords, ""]); // 빈 입력창 추가
   };
 
-  // 6. 최종 DB 저장
+  // ✅ [핵심] 최종 저장 전 밸리데이션 체크!
   const handleFinalSave = async () => {
+    // 1. 빈 칸("")이나 공백만 있는 키워드는 걸러냅니다.
+    const validKeywords = keywords.filter(word => word.trim() !== "");
+
+    // 2. 유효한 키워드가 하나도 없으면 저장을 막습니다.
+    if (validKeywords.length === 0) {
+      alert("⚠️ 저장할 키워드가 없습니다!\n최소 한 개 이상의 태그를 입력해주세요.");
+      return; // 함수 종료 (서버 요청 안 함)
+    }
+
     try {
+      // 3. 걸러진 '진짜 키워드'만 서버로 보냅니다.
       await axios.post(`http://141.147.164.232:8080/api/analyze/save/${uploadedId}`, {
-        keywords: keywords
+        keywords: validKeywords
       });
-      alert("🎉 키워드가 최종 저장되었습니다!");
-      setStep(3);
+      alert("🎉 키워드가 안전하게 저장되었습니다!");
+      setStep(3); // 저장 완료 상태
     } catch (err) {
       console.error(err);
-      alert("저장 실패");
+      alert("저장 실패: 서버 오류");
     }
   };
 
   return (
     <div className="analysis-container">
-      <h2 className="page-title">📸 AI 분석 & 키워드 편집</h2>
+      <h2 className="page-title">📸 AI 분석 스튜디오</h2>
       
-      {/* 1. 이미지 선택 영역 */}
       <div className="upload-box">
         <input type="file" id="file-input" onChange={handleFileChange} hidden />
         <label htmlFor="file-input" className="file-label">
-          {file ? "🔄 다른 사진 선택 (자동 업로드)" : "➕ 사진 선택하기"}
+          {file ? "🔄 사진 변경 (자동 업로드)" : "➕ 사진 선택하기"}
         </label>
       </div>
       
@@ -112,36 +115,38 @@ function ImageAnalysisPage() {
         </div>
       )}
 
-      {/* 2. 분석 버튼 (업로드 완료 시 보임) */}
       {step === 1 && (
-        <button 
-          onClick={handleAnalyze} 
-          disabled={isAnalyzing}
-          className="btn-analyze"
-        >
-          {isAnalyzing ? "🤖 AI가 사진을 뚫어지게 보는 중..." : "⚡ AI 분석 실행"}
+        <button onClick={handleAnalyze} disabled={isAnalyzing} className="btn-analyze">
+          {isAnalyzing ? "✨ AI가 열심히 분석 중..." : "⚡ AI 분석 실행하기"}
         </button>
       )}
 
-      {/* 3. 키워드 수정 영역 (분석 완료 시 보임) */}
       {step >= 2 && (
         <div className="edit-section">
-          <h3>✏️ 키워드를 확인하고 수정하세요</h3>
-          <p className="sub-text">AI가 제안한 태그입니다. 마음에 안 들면 고치세요!</p>
+          <h3>✏️ 해시태그 편집</h3>
+          <p className="sub-text">AI 추천 태그입니다. 자유롭게 수정하고 추가하세요!</p>
 
           <div className="keyword-edit-list">
             {keywords.map((word, index) => (
+              // ✅ 디자인 변경된 키워드 입력 그룹
               <div key={index} className="keyword-input-group">
+                <span className="hash-mark">#</span> {/* 샵(#) 모양 추가 */}
                 <input 
+                  ref={el => inputRefs.current[index] = el} // 너비 조절용 ref 연결
                   type="text" 
-                  value={word} 
+                  value={word}
+                  placeholder="태그 입력"
                   onChange={(e) => handleKeywordChange(index, e.target.value)}
                   className="keyword-input"
+                  style={{ width: `${Math.max(word.length * 12, 60)}px` }} // 초기 너비 설정
                 />
-                <button onClick={() => handleDeleteKeyword(index)} className="btn-delete">✖</button>
+                {/* ✅ 옆으로 이동한 삭제 버튼 */}
+                <button onClick={() => handleDeleteKeyword(index)} className="btn-delete" title="삭제">
+                  ×
+                </button>
               </div>
             ))}
-            <button onClick={handleAddKeyword} className="btn-add">+ 태그 추가</button>
+            <button onClick={handleAddKeyword} className="btn-add">+ 추가</button>
           </div>
 
           {step === 2 && (
@@ -149,6 +154,7 @@ function ImageAnalysisPage() {
               💾 이대로 저장하기
             </button>
           )}
+          {step === 3 && <p style={{color: '#2ecc71', fontWeight: 'bold'}}>✅ 저장이 완료되었습니다!</p>}
         </div>
       )}
     </div>
