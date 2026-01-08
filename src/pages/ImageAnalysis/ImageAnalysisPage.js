@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"; // useRef 추가 (입력창 너비 자동조절용)
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import "./ImageAnalysisPage.css";
 
@@ -10,7 +10,6 @@ function ImageAnalysisPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [step, setStep] = useState(0);
   
-  // 키워드 입력창 너비 자동 조절을 위한 ref 배열
   const inputRefs = useRef([]);
 
   const handleFileChange = async (e) => {
@@ -59,7 +58,6 @@ function ImageAnalysisPage() {
     newKeywords[index] = value;
     setKeywords(newKeywords);
     
-    // 입력된 글자 수에 맞춰 input 너비 자동 조절 (UX 개선)
     if (inputRefs.current[index]) {
         inputRefs.current[index].style.width = `${Math.max(value.length * 12, 60)}px`;
     }
@@ -71,27 +69,21 @@ function ImageAnalysisPage() {
   };
 
   const handleAddKeyword = () => {
-    setKeywords([...keywords, ""]); // 빈 입력창 추가
+    setKeywords([...keywords, ""]);
   };
 
-  // ✅ [핵심] 최종 저장 전 밸리데이션 체크!
   const handleFinalSave = async () => {
-    // 1. 빈 칸("")이나 공백만 있는 키워드는 걸러냅니다.
     const validKeywords = keywords.filter(word => word.trim() !== "");
-
-    // 2. 유효한 키워드가 하나도 없으면 저장을 막습니다.
     if (validKeywords.length === 0) {
       alert("⚠️ 저장할 키워드가 없습니다!\n최소 한 개 이상의 태그를 입력해주세요.");
-      return; // 함수 종료 (서버 요청 안 함)
+      return;
     }
 
     try {
-      // 3. 걸러진 '진짜 키워드'만 서버로 보냅니다.
       await axios.post(`http://141.147.164.232:8080/api/analyze/save/${uploadedId}`, {
         keywords: validKeywords
       });
-      alert("🎉 키워드가 안전하게 저장되었습니다!");
-      setStep(3); // 저장 완료 상태
+      setStep(3); // 저장 완료 상태로 변경
     } catch (err) {
       console.error(err);
       alert("저장 실패: 서버 오류");
@@ -123,30 +115,43 @@ function ImageAnalysisPage() {
 
       {step >= 2 && (
         <div className="edit-section">
-          <h3>✏️ 해시태그 편집</h3>
-          <p className="sub-text">AI 추천 태그입니다. 자유롭게 수정하고 추가하세요!</p>
+          <h3>
+             {step === 3 ? "✅ 저장 완료된 해시태그" : "✏️ 해시태그 편집"}
+          </h3>
+          <p className="sub-text">
+            {step === 3 
+              ? "데이터베이스에 안전하게 저장되었습니다." 
+              : "AI 추천 태그입니다. 자유롭게 수정하고 추가하세요!"}
+          </p>
 
           <div className="keyword-edit-list">
             {keywords.map((word, index) => (
-              // ✅ 디자인 변경된 키워드 입력 그룹
               <div key={index} className="keyword-input-group">
-                <span className="hash-mark">#</span> {/* 샵(#) 모양 추가 */}
+                <span className="hash-mark">#</span>
                 <input 
-                  ref={el => inputRefs.current[index] = el} // 너비 조절용 ref 연결
+                  ref={el => inputRefs.current[index] = el}
                   type="text" 
                   value={word}
-                  placeholder="태그 입력"
+                  // ✅ [수정] 저장이 완료되면(step===3) 수정 못하게 막음
+                  disabled={step === 3}
                   onChange={(e) => handleKeywordChange(index, e.target.value)}
                   className="keyword-input"
-                  style={{ width: `${Math.max(word.length * 12, 60)}px` }} // 초기 너비 설정
+                  style={{ width: `${Math.max(word.length * 12, 60)}px` }}
                 />
-                {/* ✅ 옆으로 이동한 삭제 버튼 */}
-                <button onClick={() => handleDeleteKeyword(index)} className="btn-delete" title="삭제">
-                  ×
-                </button>
+                
+                {/* ✅ [수정] 저장이 완료되면(step===3) 삭제 버튼(x) 숨김 */}
+                {step !== 3 && (
+                  <button onClick={() => handleDeleteKeyword(index)} className="btn-delete" title="삭제">
+                    ×
+                  </button>
+                )}
               </div>
             ))}
-            <button onClick={handleAddKeyword} className="btn-add">+ 추가</button>
+
+            {/* ✅ [요청하신 부분] 저장이 완료되면 '추가' 버튼 숨김 */}
+            {step !== 3 && (
+               <button onClick={handleAddKeyword} className="btn-add">+ 추가</button>
+            )}
           </div>
 
           {step === 2 && (
@@ -154,7 +159,14 @@ function ImageAnalysisPage() {
               💾 이대로 저장하기
             </button>
           )}
-          {step === 3 && <p style={{color: '#2ecc71', fontWeight: 'bold'}}>✅ 저장이 완료되었습니다!</p>}
+          
+          {step === 3 && (
+            <div style={{marginTop: '20px'}}>
+               <p style={{color: '#2ecc71', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '10px'}}>
+                 🎉 저장이 완료되었습니다!
+               </p>
+            </div>
+          )}
         </div>
       )}
     </div>
