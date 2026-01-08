@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react"; // useEffect 추가
 import axios from "axios";
 import "./ImageAnalysisPage.css";
 
@@ -11,6 +11,12 @@ function ImageAnalysisPage() {
   const [step, setStep] = useState(0);
   
   const inputRefs = useRef([]);
+
+  // ✅ [추가] 너비 계산 함수 (한글은 폭이 넓으므로 넉넉하게 잡음)
+  const calculateWidth = (text) => {
+    // 기본 40px + 글자당 15px (한글 깨짐 방지)
+    return Math.max(text.length * 15 + 20, 60); 
+  };
 
   const handleFileChange = async (e) => {
     const selected = e.target.files[0];
@@ -58,8 +64,9 @@ function ImageAnalysisPage() {
     newKeywords[index] = value;
     setKeywords(newKeywords);
     
+    // ✅ 입력할 때 실시간으로 너비 조절
     if (inputRefs.current[index]) {
-        inputRefs.current[index].style.width = `${Math.max(value.length * 12, 60)}px`;
+        inputRefs.current[index].style.width = `${calculateWidth(value)}px`;
     }
   };
 
@@ -83,7 +90,7 @@ function ImageAnalysisPage() {
       await axios.post(`http://141.147.164.232:8080/api/analyze/save/${uploadedId}`, {
         keywords: validKeywords
       });
-      setStep(3); // 저장 완료 상태로 변경
+      setStep(3);
     } catch (err) {
       console.error(err);
       alert("저장 실패: 서버 오류");
@@ -115,9 +122,7 @@ function ImageAnalysisPage() {
 
       {step >= 2 && (
         <div className="edit-section">
-          <h3>
-             {step === 3 ? "✅ 저장 완료된 해시태그" : "✏️ 해시태그 편집"}
-          </h3>
+          <h3>{step === 3 ? "✅ 저장 완료된 해시태그" : "✏️ 해시태그 편집"}</h3>
           <p className="sub-text">
             {step === 3 
               ? "데이터베이스에 안전하게 저장되었습니다." 
@@ -125,30 +130,38 @@ function ImageAnalysisPage() {
           </p>
 
           <div className="keyword-edit-list">
-            {keywords.map((word, index) => (
-              <div key={index} className="keyword-input-group">
-                <span className="hash-mark">#</span>
-                <input 
-                  ref={el => inputRefs.current[index] = el}
-                  type="text" 
-                  value={word}
-                  // ✅ [수정] 저장이 완료되면(step===3) 수정 못하게 막음
-                  disabled={step === 3}
-                  onChange={(e) => handleKeywordChange(index, e.target.value)}
-                  className="keyword-input"
-                  style={{ width: `${Math.max(word.length * 12, 60)}px` }}
-                />
-                
-                {/* ✅ [수정] 저장이 완료되면(step===3) 삭제 버튼(x) 숨김 */}
-                {step !== 3 && (
-                  <button onClick={() => handleDeleteKeyword(index)} className="btn-delete" title="삭제">
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
+            {keywords.map((word, index) => {
+              // ✅ [핵심 변경] 저장 완료(step 3)면 'span'으로, 편집 중이면 'input'으로 보여줌
+              if (step === 3) {
+                return (
+                  <span key={index} className="keyword-tag-final">
+                    <span className="hash-mark-final">#</span>
+                    {word}
+                  </span>
+                );
+              } else {
+                return (
+                  <div key={index} className="keyword-input-group">
+                    <span className="hash-mark">#</span>
+                    <input 
+                      ref={el => {
+                        inputRefs.current[index] = el;
+                        // 초기 렌더링 시에도 너비 맞춤
+                        if (el) el.style.width = `${calculateWidth(word)}px`;
+                      }}
+                      type="text" 
+                      value={word}
+                      onChange={(e) => handleKeywordChange(index, e.target.value)}
+                      className="keyword-input"
+                    />
+                    <button onClick={() => handleDeleteKeyword(index)} className="btn-delete" title="삭제">
+                      ×
+                    </button>
+                  </div>
+                );
+              }
+            })}
 
-            {/* ✅ [요청하신 부분] 저장이 완료되면 '추가' 버튼 숨김 */}
             {step !== 3 && (
                <button onClick={handleAddKeyword} className="btn-add">+ 추가</button>
             )}
@@ -161,8 +174,8 @@ function ImageAnalysisPage() {
           )}
           
           {step === 3 && (
-            <div style={{marginTop: '20px'}}>
-               <p style={{color: '#2ecc71', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '10px'}}>
+            <div style={{marginTop: '30px'}}>
+               <p style={{color: '#2ecc71', fontWeight: '800', fontSize: '1.3rem'}}>
                  🎉 저장이 완료되었습니다!
                </p>
             </div>
