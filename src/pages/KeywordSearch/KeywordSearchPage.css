@@ -78,3 +78,149 @@
   font-size: 1.1rem;
   margin-top: 30px;
 }
+
+/* ... 기존 스타일 유지 ... */
+
+.search-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+/* ... (검색창 스타일 등 기존 유지) ... */
+
+/* 결과 그리드 */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* 이미지 카드 (클릭 가능하게) */
+.image-card {
+  position: relative; /* 호버 효과를 위해 */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background: #fff;
+  cursor: pointer; /* 손가락 모양 커서 */
+  aspect-ratio: 1 / 1; /* 정사각형 비율 유지 */
+}
+
+.result-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+
+/* 마우스 올렸을 때 이미지 확대 */
+.image-card:hover .result-img {
+  transform: scale(1.1);
+}
+
+/* 마우스 올렸을 때 '크게 보기' 오버레이 */
+.hover-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.image-card:hover .hover-overlay {
+  opacity: 1;
+}
+
+.hover-overlay span {
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: 2px solid white;
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+/* ✅ 모달 (팝업) 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* 배경 어둡게 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  max-width: 90%;
+  max-height: 90%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.modal-img {
+  max-width: 100%;
+  max-height: 70vh; /* 화면 높이의 70%까지만 */
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 3rem;
+  cursor: pointer;
+}
+
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.file-name {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.btn-download {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.3s;
+}
+
+.btn-download:hover {
+  background-color: #1976D2;
+}
