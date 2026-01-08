@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import ImageAnalysis from "./pages/ImageAnalysis/ImageAnalysis";
 import KeywordSearch from "./pages/KeywordSearch/KeywordSearch";
-import "./App.css";
+import "./styles/App.css";
 
 function App() {
   return (
