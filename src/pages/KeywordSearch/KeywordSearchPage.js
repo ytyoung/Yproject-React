@@ -7,8 +7,6 @@ function KeywordSearchPage() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
-  
-  // ✅ [추가] 선택된 이미지(팝업용) 상태
   const [selectedImg, setSelectedImg] = useState(null);
 
   const handleSearch = async (e) => {
@@ -35,23 +33,34 @@ function KeywordSearchPage() {
     return `http://141.147.164.232:8080/uploads/${filename}`;
   };
 
-  // ✅ [추가] 이미지 클릭 시 모달 열기
-  const openModal = (img) => {
-    setSelectedImg(img);
-  };
+  const openModal = (img) => { setSelectedImg(img); };
+  const closeModal = () => { setSelectedImg(null); };
 
-  // ✅ [추가] 모달 닫기
-  const closeModal = () => {
-    setSelectedImg(null);
-  };
-
-  // ✅ [추가] 이미지 다운로드 함수
-  const handleDownload = async (imgUrl, originalName) => {
+  // ✅ [핵심 기능 변경] 다운로드 또는 공유하기
+  const handleDownloadOrShare = async (imgUrl, originalName) => {
     try {
+      // 1. 이미지 데이터를 가져와서 파일 객체로 변환
       const response = await fetch(imgUrl);
       const blob = await response.blob();
+      const file = new File([blob], originalName || "image.jpg", { type: blob.type });
+
+      // 2. 모바일 공유 기능(navigator.share) 지원 여부 확인
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'PhotoSense 이미지 다운로드',
+            text: '이미지를 갤러리에 저장하려면 [이미지 저장]을 선택하세요.',
+          });
+          return; // 공유 창이 뜨면 여기서 종료
+        } catch (err) {
+          if (err.name !== "AbortError") console.error("공유 실패:", err);
+          // 공유하다가 취소했거나 에러나면 아래 다운로드 로직으로 넘어감 (fallback)
+        }
+      }
+
+      // 3. PC거나 공유 기능이 없으면 기존 방식대로 다운로드
       const url = window.URL.createObjectURL(blob);
-      
       const link = document.createElement("a");
       link.href = url;
       link.download = originalName || "download_image.jpg";
@@ -59,8 +68,9 @@ function KeywordSearchPage() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+
     } catch (err) {
-      console.error("다운로드 실패:", err);
+      console.error("다운로드/공유 실패:", err);
       alert("이미지 저장 중 오류가 발생했습니다.");
     }
   };
@@ -78,9 +88,7 @@ function KeywordSearchPage() {
           onKeyDown={handleSearch}
           className="search-input"
         />
-        <button onClick={handleSearch} className="search-btn">
-          검색
-        </button>
+        <button onClick={handleSearch} className="search-btn">검색</button>
       </div>
 
       {loading && <p className="loading-text">데이터베이스를 뒤지는 중...</p>}
@@ -97,15 +105,11 @@ function KeywordSearchPage() {
               alt={img.original_name} 
               className="result-img" 
             />
-            {/* 마우스 올리면 돋보기 아이콘 효과 */}
-            <div className="hover-overlay">
-                <span>🔍 크게 보기</span>
-            </div>
+            <div className="hover-overlay"><span>🔍 크게 보기</span></div>
           </div>
         ))}
       </div>
 
-      {/* ✅ [추가] 이미지 상세 모달 (Popup) */}
       {selectedImg && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -119,12 +123,17 @@ function KeywordSearchPage() {
             
             <div className="modal-footer">
                 <span className="file-name">{selectedImg.original_name}</span>
+                
+                {/* ✅ 버튼 기능 변경 및 힌트 메시지 추가 */}
                 <button 
                   className="btn-download"
-                  onClick={() => handleDownload(getImageUrl(selectedImg.file_path), selectedImg.original_name)}
+                  onClick={() => handleDownloadOrShare(getImageUrl(selectedImg.file_path), selectedImg.original_name)}
                 >
-                  💾 내 컴퓨터에 저장
+                  💾 저장 / 공유하기
                 </button>
+                <p className="mobile-hint">
+                  (모바일에서는 이미지를 꾹 눌러서 저장할 수도 있어요!)
+                </p>
             </div>
           </div>
         </div>

@@ -224,3 +224,21 @@
 .btn-download:hover {
   background-color: #1976D2;
 }
+
+.mobile-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 10px;
+  display: none; /* PC에서는 숨김 */
+}
+
+/* 모바일 화면에서만 힌트 보이기 */
+@media screen and (max-width: 768px) {
+  .mobile-hint {
+    display: block;
+  }
+  .btn-download {
+    width: 100%;
+    justify-content: center;
+  }
+}
